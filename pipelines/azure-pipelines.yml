@@ -38,7 +38,7 @@ stages:
           scriptLocation: inlineScript  
           inlineScript: |
             az cosmosdb sql database create -a ${{ variables.account_name }} -g ${{ variables.project_name }}-rg -n appointments
-            az cosmosdb sql container create -a ${{ variables.account_name }} -g ${{ variables.project_name }}-rg -d appointments -n items --partition-key-path "/id" --throughput "1000
+            az cosmosdb sql container create -a ${{ variables.account_name }} -g ${{ variables.project_name }}-rg -d appointments -n items --partition-key-path "/id" --throughput "1000"
 
     - job: tests
       dependsOn: cosmosdb
