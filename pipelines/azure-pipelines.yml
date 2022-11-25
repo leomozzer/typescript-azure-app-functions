@@ -52,8 +52,8 @@ stages:
           scriptType: 'bash'
           scriptLocation: inlineScript  
           inlineScript: |
-            COSMOSDB_KEY=$(az cosmosdb keys list -n ${{ variables.account_name }} -g ${{ variables.project_name }}-rg --query secondaryMasterKey --output tsv)
-            echo "##vso[task.setvariable variable=COSMOSDB_KEY;isoutput=true]${COSMOSDB_KEY}"
+            cosmokey=$(az cosmosdb keys list -n ${{ variables.account_name }} -g ${{ variables.project_name }}-rg --query secondaryMasterKey --output tsv)
+            echo "##vso[task.setvariable variable=COSMOSDB_KEY]${cosmokey}"
       - bash: |
           echo $(COSMOSDB_KEY)
 
