@@ -74,16 +74,20 @@ stages:
           COSMOSDB_KEY: $[ dependencies.tests.outputs['cosmosdbkey.COSMOSDB_KEY'] ] 
       displayName: Deploy App Function
       steps:
+      - bash: |
+          echo $(COSMOSDB_KEY)
+
       - script: |
           npm i
           npm run build
+          npm install --global azure-functions-core-tools@2
         displayName: "npm build"
         env:
           COSMOSDB_NAME: ${{ variables.account_name }}
           COSMOSDB_KEY: $(COSMOSDB_KEY)
 
       - task: AzureCLI@2
-        displayName: 'Get cosmosdb secondaryMasterKey'
+        displayName: 'Deploy App Function'
         inputs:
           azureSubscription: ${{ variables.service_connection_name }}
           scriptType: 'bash'
