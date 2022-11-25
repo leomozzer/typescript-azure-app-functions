@@ -1,0 +1,62 @@
+trigger:
+  paths:
+    exclude:
+    - .gitignore
+    - .github/
+    - README.md
+    - LICENSE
+
+variables:
+  build_counter: $[counter('build-counter-$(RELEASE_NAME)', 1)]
+  project_name: "typescript-app-functions"
+  service_connection_name: "SC-AzureDevOps" 
+  account_name: "comosdblso1234"
+  resource_group_location: "eastus"
+
+pool:
+  vmImage: ubuntu-latest
+  
+stages:
+  - stage: dev
+    jobs:
+    - job: cosmosdb
+      displayName: Create CosmosDB
+      steps:
+      - template: ./templates/cosmosdb.yaml
+        parameters:
+          tags: '"DeployedUsing=Azure CLI"'
+          resource_group_name: ${{ variables.project_name }}-rg
+          account_name: ${{ variables.account_name }}
+          service_connection_name: ${{ variables.service_connection_name }}
+          resource_group_location: ${{ variables.resource_group_location }}
+
+      - task: AzureCLI@2
+        displayName: 'Create database and container'
+        inputs:
+          azureSubscription: ${{ parameters.service_connection_name }}
+          scriptType: 'bash'
+          scriptLocation: inlineScript  
+          inlineScript: |
+            az cosmosdb sql database create -a ${{ variables.account_name }} -g ${{ variables.project_name }}-rg -n appointments
+            az cosmosdb sql container create -a ${{ variables.account_name }} -g ${{ variables.project_name }}-rg -d appointments -n items
+
+    - job: tests
+      displayName: Perform Tests
+      steps:
+      - task: AzureCLI@2
+        displayName: 'Create database and container'
+        inputs:
+          azureSubscription: ${{ parameters.service_connection_name }}
+          scriptType: 'bash'
+          scriptLocation: inlineScript  
+          inlineScript: |
+            COSMOSDB_KEY=$(az cosmosdb keys list -n ${{ variables.account_name }} -g ${{ variables.project_name }}-rg --query secondaryMasterKey --output tsv)
+            echo "##vso[task.setvariable variable=COSMOSDB_KEY;isoutput=true]${COSMOSDB_KEY}"
+            
+      - script: |
+          npm i
+          npm test
+        displayName: "npm test"
+        env:
+          COSMOSDB_NAME: ${{ variables.account_name }}
+          COSMOSDB_KEY: $(COSMOSDB_KEY)
