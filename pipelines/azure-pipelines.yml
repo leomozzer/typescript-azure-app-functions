@@ -82,6 +82,9 @@ stages:
         env:
           COSMOSDB_NAME: ${{ variables.account_name }}
           COSMOSDB_KEY: $(COSMOSDB_KEY)
+      
+      - bash: |
+          ls -ltr
 
       - task: AzureCLI@2
         displayName: 'Deploy App Function'
