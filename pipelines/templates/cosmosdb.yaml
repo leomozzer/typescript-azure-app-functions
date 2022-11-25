@@ -15,4 +15,4 @@ steps:
       scriptLocation: inlineScript  
       inlineScript: |
         az group create --location ${{ parameters.resource_group_location }} --resource-group ${{ parameters.resource_group_name }} --tags ${{ parameters.tags }}
-        az cosmosdb create --name ${{ parameters.account_name }} --resource-group ${{ parameters.resource_group_name }} --locations regionName=${{ parameters.resource_group_name }}
+        az cosmosdb create --name ${{ parameters.account_name }} --resource-group ${{ parameters.resource_group_name }} --locations regionName=${{ parameters.resource_group_location }}
