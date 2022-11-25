@@ -74,9 +74,6 @@ stages:
           COSMOSDB_KEY: $[ dependencies.tests.outputs['cosmosdbkey.COSMOSDB_KEY'] ] 
       displayName: Deploy App Function
       steps:
-      - bash: |
-          echo $(COSMOSDB_KEY)
-
       - script: |
           npm i
           npm run build
@@ -95,4 +92,4 @@ stages:
           inlineScript: |
             az storage account create --name ${{ variables.storage_account_name }} --location ${{ variables.resource_group_location }} --resource-group ${{ variables.project_name }}-rg --sku Standard_LRS
             az functionapp create --resource-group ${{ variables.project_name }}-rg --consumption-plan-location ${{ variables.resource_group_location }} --runtime node --runtime-version ${{ variables.runtime_version }}  --functions-version 4 --name ${{ variables.project_name }} --storage-account ${{ variables.storage_account_name }}
-            func azure functionapp publish ${{ variables.project_name }}
+            func azure functionapp publish ${{ variables.project_name }} --typescript
