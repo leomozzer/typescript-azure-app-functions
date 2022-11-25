@@ -41,6 +41,8 @@ stages:
             az cosmosdb sql container create -a ${{ variables.account_name }} -g ${{ variables.project_name }}-rg -d appointments -n items
 
     - job: tests
+      dependsOn: cosmosdb
+      condition: succeeded()
       displayName: Perform Tests
       steps:
       - task: AzureCLI@2
