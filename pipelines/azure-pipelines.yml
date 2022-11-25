@@ -10,8 +10,10 @@ variables:
   build_counter: $[counter('build-counter-$(RELEASE_NAME)', 1)]
   project_name: "typescript-app-functions"
   service_connection_name: "SC-AzureDevOps" 
-  account_name: "comosdblso1234"
+  account_name: "cosmosappfunctions"
   resource_group_location: "eastus"
+  storage_account_name: "stoappfunctions"
+  runtime_version: 16
 
 pool:
   vmImage: ubuntu-latest
@@ -47,6 +49,7 @@ stages:
       steps:
       - task: AzureCLI@2
         displayName: 'Get cosmosdb secondaryMasterKey'
+        name: cosmosdbkey
         inputs:
           azureSubscription: ${{ variables.service_connection_name }}
           scriptType: 'bash'
@@ -54,8 +57,7 @@ stages:
           inlineScript: |
             cosmokey=$(az cosmosdb keys list -n ${{ variables.account_name }} -g ${{ variables.project_name }}-rg --query secondaryMasterKey --output tsv)
             echo "##vso[task.setvariable variable=COSMOSDB_KEY]${cosmokey}"
-      - bash: |
-          echo $(COSMOSDB_KEY)
+            echo "##vso[task.setvariable variable=COSMOSDB_KEY;isoutput=true]${cosmokey}"
 
       - script: |
           npm i
@@ -64,3 +66,29 @@ stages:
         env:
           COSMOSDB_NAME: ${{ variables.account_name }}
           COSMOSDB_KEY: $(COSMOSDB_KEY)
+
+    - job: build
+      dependsOn: tests
+      condition: succeeded()
+      variables:
+          COSMOSDB_KEY: $[ dependencies.tests.outputs['cosmosdbkey.COSMOSDB_KEY'] ] 
+      displayName: Deploy App Function
+      steps:
+      - script: |
+          npm i
+          npm run build
+        displayName: "npm build"
+        env:
+          COSMOSDB_NAME: ${{ variables.account_name }}
+          COSMOSDB_KEY: $(COSMOSDB_KEY)
+
+      - task: AzureCLI@2
+        displayName: 'Get cosmosdb secondaryMasterKey'
+        inputs:
+          azureSubscription: ${{ variables.service_connection_name }}
+          scriptType: 'bash'
+          scriptLocation: inlineScript  
+          inlineScript: |
+            az storage account create --name ${{ variables.storage_account_name }} --location ${{ variables.resource_group_location }} --resource-group ${{ variables.project_name }}-rg --sku Standard_LRS
+            az functionapp create --resource-group ${{ variables.project_name }}-rg --consumption-plan-location ${{ variables.resource_group_location }} --runtime node --runtime-version ${{ variables.runtime_version }}  --functions-version 4 --name ${{ variables.project_name }} --storage-account ${{ variables.storage_account_name }}
+            func azure functionapp publish ${{ variables.project_name }}
