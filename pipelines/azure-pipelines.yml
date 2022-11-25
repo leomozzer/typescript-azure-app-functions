@@ -93,6 +93,8 @@ stages:
           scriptType: 'bash'
           scriptLocation: inlineScript  
           inlineScript: |
+            export COSMOSDB_NAME=${{ variables.account_name }}
+            export COSMOSDB_KEY=$(COSMOSDB_KEY)
             az storage account create --name ${{ variables.storage_account_name }} --location ${{ variables.resource_group_location }} --resource-group ${{ variables.project_name }}-rg --sku Standard_LRS
-            az functionapp create --resource-group ${{ variables.project_name }}-rg --consumption-plan-location ${{ variables.resource_group_location }} --runtime node --runtime-version ${{ variables.runtime_version }}  --functions-version 4 --name ${{ variables.project_name }} --storage-account ${{ variables.storage_account_name }}
+            az functionapp create --resource-group ${{ variables.project_name }}-rg --consumption-plan-location ${{ variables.resource_group_location }} --runtime node --runtime-version ${{ variables.runtime_version }} --functions-version 4 --name ${{ variables.project_name }} --storage-account ${{ variables.storage_account_name }}
             func azure functionapp publish ${{ variables.project_name }} --typescript
