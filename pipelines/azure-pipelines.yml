@@ -76,7 +76,10 @@ stages:
       steps:
       - powershell: New-Item -Path ".\" -Name ".env" -Value "COSMOSDB_NAME=${{ variables.account_name }}`nCOSMOSDB_KEY=$(COSMOSDB_KEY)"
         displayName: "Create .env file"
-        
+
+      - bash: |
+          ls -ltr
+
       - script: |
           npm i
           npm i -g azure-functions-core-tools@4 --unsafe-perm true
@@ -85,9 +88,6 @@ stages:
         env:
           COSMOSDB_NAME: ${{ variables.account_name }}
           COSMOSDB_KEY: $(COSMOSDB_KEY)
-      
-      - bash: |
-          ls -ltr
 
       - task: AzureCLI@2
         displayName: 'Deploy App Function'
