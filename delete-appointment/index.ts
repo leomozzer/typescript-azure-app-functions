@@ -1,6 +1,5 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import { DeleteAppointment } from "../src/handlers/appointments";
-import { AppointmentContainer } from '../src/utils/cosmos-db';
 
 const DeleteAppointmentController: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     context.log('HTTP trigger function processed a request.');

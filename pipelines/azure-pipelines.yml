@@ -5,6 +5,7 @@ trigger:
     - .github/
     - README.md
     - LICENSE
+    - "*.env"
 
 variables:
   build_counter: $[counter('build-counter-$(RELEASE_NAME)', 1)]
@@ -76,9 +77,6 @@ stages:
       steps:
       - powershell: New-Item -Path ".\" -Name ".env" -Value "COSMOSDB_NAME='${{ variables.account_name }}'`nCOSMOSDB_KEY='$(COSMOSDB_KEY)'"
         displayName: "Create .env file"
-
-      - bash: |
-          ls -ltr
 
       - script: |
           npm i
