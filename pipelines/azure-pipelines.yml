@@ -76,8 +76,8 @@ stages:
       steps:
       - script: |
           npm i
-          npm run build
           npm i -g azure-functions-core-tools@4 --unsafe-perm true
+          npm run build
         displayName: "npm build"
         env:
           COSMOSDB_NAME: ${{ variables.account_name }}
