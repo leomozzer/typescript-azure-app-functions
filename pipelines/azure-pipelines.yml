@@ -74,6 +74,9 @@ stages:
           COSMOSDB_KEY: $[ dependencies.tests.outputs['cosmosdbkey.COSMOSDB_KEY'] ] 
       displayName: Deploy App Function
       steps:
+      - powershell: New-Item -Path ".\" -Name ".env" -Value "COSMOSDB_NAME=${{ variables.account_name }}`nCOSMOSDB_KEY=$(COSMOSDB_KEY)"
+        displayName: "Create .env file"
+        
       - script: |
           npm i
           npm i -g azure-functions-core-tools@4 --unsafe-perm true
