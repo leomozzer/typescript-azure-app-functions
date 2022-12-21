@@ -40,7 +40,7 @@ func azure functionapp publish <APP_NAME>
 {
     "name": "John Doe",
     "starstAt": "17/12/2022",
-    "starstAt": "18/12/2022"
+    "endsAt": "18/12/2022"
 }
 ```
 
@@ -64,7 +64,7 @@ func azure functionapp publish <APP_NAME>
 {
     "name": "John Doe",
     "starstAt": "17/12/2022",
-    "starstAt": "18/12/2022",
+    "endsAt": "18/12/2022",
     "id": "726c2f56-b35d-4f5a-b9cf-720e636feebc"
 }
 ```
